@@ -1,0 +1,168 @@
+package com.kk.preeeagainexitwithoutfragment;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+
+
+public abstract class BackHandledFragment extends Fragment {
+
+	protected BackHandledInterface mBackHandledInterface;
+	
+	/**
+	 * ????BackHandledFragment???????????????Back???????
+	 * FragmentActivity??????????????????Fragment???????
+	 * ????Fragment???FragmentActivity?????????
+	 */
+	protected abstract boolean onBackPressed();
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		if(!(getActivity() instanceof BackHandledInterface)){
+			throw new ClassCastException("Hosting Activity must implement BackHandledInterface");
+		}else{
+			this.mBackHandledInterface = (BackHandledInterface)getActivity();
+		}
+	}
+	
+	@Override
+	public void onStart() {
+		super.onStart();
+		//??FragmentActivity???Fragment???
+		mBackHandledInterface.setSelectedFragment(this);
+	}
+	
+}
+
+//========================
+package com.kk.preeeagainexitwithoutfragment;
+
+public interface BackHandledInterface {
+
+	public abstract void setSelectedFragment(BackHandledFragment selectedFragment);
+}
+
+//=========================
+
+package com.kk.preeeagainexitwithoutfragment;
+
+import com.kk.pressagainexitwithoutfragment.R;
+
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.Toast;
+
+public class MainActivity extends FragmentActivity implements BackHandledInterface{
+
+	private BackHandledFragment mBackHandedFragment;
+	
+	private Button mBtn;
+	
+	/** ?????????? */
+    private long lastBackPressed;
+    /** ?????????? */
+    private static final int QUIT_INTERVAL = 2000;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		this.mBtn = (Button)findViewById(R.id.btn);
+		this.mBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				MyFragment f = new MyFragment();
+				FragmentManager fm = getSupportFragmentManager();
+				FragmentTransaction ft = fm.beginTransaction();
+				ft.replace(R.id.container, f);
+				ft.addToBackStack("tag");
+				ft.commit();
+			}
+		});
+	}
+
+	@Override
+	public void setSelectedFragment(BackHandledFragment selectedFragment) {
+		this.mBackHandedFragment = selectedFragment;
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if(mBackHandedFragment == null || !mBackHandedFragment.onBackPressed()){
+			if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+				long backPressed = System.currentTimeMillis();
+				if (backPressed - lastBackPressed > QUIT_INTERVAL) {
+					lastBackPressed = backPressed;
+					Toast.makeText(this, "??????", Toast.LENGTH_LONG).show();
+				} else {
+					finish();
+					System.exit(0);
+				}
+			} else {
+				getSupportFragmentManager().popBackStack();
+			}
+		}
+	}
+}
+
+//================================
+package com.kk.preeeagainexitwithoutfragment;
+
+import com.kk.pressagainexitwithoutfragment.R;
+
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+public class MyFragment extends BackHandledFragment {
+	
+	private boolean hadIntercept;	
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater,
+			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+		return getLayoutInflater(savedInstanceState).inflate(R.layout.fragment_a, null);
+	}
+	
+	@Override
+	protected boolean onBackPressed() {
+		if(hadIntercept){
+			return false;
+		}else{
+			getFragmentManager().popBackStack();
+			hadIntercept = true;
+			return true;
+		}
+	}
+
+}
+
+//=============
+        // 检查是否存在SD卡  
+        public void checkTheSdCard() {  
+            /* 判断存储卡是否存在 */  
+            if (android.os.Environment.getExternalStorageState().equals(  
+                    android.os.Environment.MEDIA_MOUNTED)) {  
+                bIfSDExist = true;  
+            } else {  
+                bIfSDExist = false;  
+                mMakeTextToast(getResources().getText(R.string.str_err_nosd)  
+                        .toString(), true);  
+            }  
+        }  
+      
+//===================
+
+
+
+

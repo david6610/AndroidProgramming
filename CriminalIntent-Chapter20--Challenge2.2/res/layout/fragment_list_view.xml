@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>  
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+     android:orientation="vertical"
+     android:background="#FFFFFF"
+     android:paddingLeft="8dp"
+     android:paddingRight="8dp" >
+     <ListView
+         android:id="@+id/android:list"
+         android:layout_width="match_parent"
+         android:layout_height="0dp"
+         android:layout_weight="0.79"
+         android:background="#DFDFDF"
+         android:drawSelectorOnTop="true" />
+  
+     <TextView  
+            android:id="@+id/android:empty"  
+            android:layout_width="match_parent"  
+            android:layout_height="match_parent"  
+            android:gravity="center"  
+            android:padding="15dip"  
+            android:text="This is a list Fragment.\nBut The List is empty!"  
+            android:textSize="22sp"  
+            android:visibility="gone" />  
+     <Button
+         android:id="@+id/load_items_fragment"
+         style="?android:attr/buttonStyleSmall"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:visibility="gone" 
+         android:text="Load a Fragment With Items" />
+ </LinearLayout>
+ 
